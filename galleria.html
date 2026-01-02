@@ -3,27 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galleria Condivisa 2025</title>
+    <title>Galleria Comune 2025</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.10.3/simple-lightbox.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px; }
         .photo-container img { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; cursor: pointer; }
-        .back-link { display: inline-block; margin: 20px; color: #FFD700; text-decoration: none; border: 1px solid #FFD700; padding: 5px 15px; border-radius: 5px; }
+        .button-container { margin: 20px; display: flex; justify-content: center; gap: 10px; }
+        .back-link { display: inline-block; color: #FFD700; text-decoration: none; border: 1px solid #FFD700; padding: 8px 15px; border-radius: 8px; }
     </style>
 </head>
 <body>
     <h1>Galleria Comune</h1>
-    <a href="index.html" class="back-link">← Carica altre foto</a>
-    <p id="loading">Caricamento foto degli invitati...</p>
+    
+    <div class="button-container">
+        <a href="index.html" class="back-link">← Carica Foto</a>
+        <button id="downloadAllBtn" class="download-btn">Scarica Tutto (.ZIP)</button>
+    </div>
+
+    <p id="loading">Caricamento galleria condivisa...</p>
     <div class="gallery-grid" id="gallery-container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.10.3/simple-lightbox.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+
     <script>
         const CLOUD_NAME = "dherkuwvn";
         const TAG = "foto_capodanno_2024";
         const LIST_URL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/${TAG}.json`;
+        let globalImages = [];
 
         async function loadGallery() {
             const container = document.getElementById('gallery-container');
@@ -31,9 +41,10 @@
             try {
                 const res = await fetch(LIST_URL);
                 const data = await res.json();
+                globalImages = data.resources;
                 loader.style.display = 'none';
 
-                data.resources.reverse().forEach(img => {
+                globalImages.slice().reverse().forEach(img => {
                     const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/v${img.version}/${img.public_id}.${img.format}`;
                     const item = document.createElement('div');
                     item.className = 'photo-container';
@@ -42,9 +53,32 @@
                 });
                 new SimpleLightbox('.photo-container a');
             } catch (e) {
-                loader.textContent = "Nessuna foto trovata o errore di configurazione.";
+                loader.textContent = "La galleria è ancora vuota!";
             }
         }
+
+        document.getElementById('downloadAllBtn').addEventListener('click', async function() {
+            const btn = this;
+            if (globalImages.length === 0) return alert("Nessuna foto da scaricare!");
+            
+            btn.disabled = true;
+            btn.textContent = 'Creazione ZIP...';
+            const zip = new JSZip();
+
+            const promises = globalImages.map(async (img, i) => {
+                const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/v${img.version}/${img.public_id}.${img.format}`;
+                const res = await fetch(url);
+                const blob = await res.blob();
+                zip.file(`foto_${i+1}.${img.format}`, blob);
+            });
+
+            await Promise.all(promises);
+            const content = await zip.generateAsync({type:"blob"});
+            saveAs(content, "Capodanno_2025_TutteLeFoto.zip");
+            btn.disabled = false;
+            btn.textContent = 'Scarica Tutto (.ZIP)';
+        });
+
         loadGallery();
     </script>
 </body>

@@ -10,7 +10,7 @@ const fileInput = document.getElementById('fileInput');
 const statusMessage = document.getElementById('uploadStatus');
 const spinner = document.querySelector('.spinner');
 
-// Caricamento Foto
+// Gestione del Caricamento
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const files = Array.from(fileInput.files);
@@ -23,10 +23,13 @@ form.addEventListener('submit', async (e) => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('upload_preset', UPLOAD_PRESET);
-        formData.append('tags', TAG); // Assegna il tag per la condivisione
+        formData.append('tags', TAG); 
 
         return fetch(UPLOAD_URL, { method: 'POST', body: formData })
-            .then(res => res.json());
+            .then(res => {
+                if (!res.ok) throw new Error("Errore durante l'upload");
+                return res.json();
+            });
     });
 
     try {
@@ -39,12 +42,13 @@ form.addEventListener('submit', async (e) => {
         
         setTimeout(() => location.reload(), 2500);
     } catch (err) {
-        statusMessage.textContent = "Errore nel caricamento.";
+        statusMessage.textContent = "Errore durante il caricamento. Riprova.";
+        statusMessage.style.color = 'red';
         spinner.style.display = 'none';
     }
 });
 
-// Slideshow Condiviso
+// Slideshow Condiviso (Legge da Cloudinary)
 async function initSlideshow() {
     const bookPage = document.querySelector(".book-page");
     const container = document.querySelector(".slideshow-container");
@@ -71,9 +75,7 @@ async function initSlideshow() {
                 }, 800);
             }, 4000);
         }
-    } catch (e) { console.log("Slideshow vuoto o errore"); }
+    } catch (e) { console.log("Slideshow in attesa di foto..."); }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    initSlideshow();
-});
+document.addEventListener('DOMContentLoaded', initSlideshow);

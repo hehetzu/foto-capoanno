@@ -3,39 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foto Capodanno 2025</title>
-    <!-- Google Font Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>Capodanno 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="home-page">
     <div class="container">
         <h1>Capodanno 2025</h1>
-        <p>Carica qui le foto più belle della serata!</p>
+        <p>Tutti gli invitati possono vedere le foto qui!</p>
         
         <form id="uploadForm">
-            <input type="file" name="file" id="fileInput" accept="image/*" required multiple>
-            <button type="submit" class="btn">Carica Foto</button>
+            <input type="file" id="fileInput" accept="image/*" required multiple>
+            <button type="submit" class="btn">Carica nella Galleria Comune</button>
         </form>
-        <!-- Contenitore per lo stato del caricamento -->
+
         <div id="status-container">
             <div class="spinner"></div>
             <p id="uploadStatus"></p>
         </div>
         
-        <!-- Contenitore per lo slideshow -->
         <div class="slideshow-container">
             <div class="book-page"></div>
         </div>
 
-        <a href="galleria.html" class="gallery-link">Guarda tutte le foto</a>
+        <a href="galleria.html" class="gallery-link">Apri Galleria Condivisa</a>
     </div>
 
-    <!-- Libreria per i coriandoli -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <!-- Il nostro script personalizzato -->
     <script src="script.js"></script>
 </body>
 </html>
